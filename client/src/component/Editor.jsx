@@ -31,15 +31,29 @@ const Editor = () => {
   const [socket, setSocket] = useState();
   const [quill, setQuill] = useState();
 
-  useEffect(() => {
-    const quillServer = new Quill("#container", { theme: "snow", modules: { toolbar: toolbarOptions } });
-    quillServer.disable();
-    quillServer.setText("Loading the document....");
-    setQuill(quillServer);
-  }, []);
+  // useEffect(() => {
+  //   const quillServer = new Quill("#container", { theme: "snow", modules: { toolbar: toolbarOptions } });
+  //   quillServer.disable();
+  //   quillServer.setText("Loading the document....");
+  //   setQuill(quillServer);
+  // }, []);
 
   useEffect(() => {
-    const socketServer = io("https://collab-docs-any8.onrender.com", { transports: ['websocket'] });
+  const container = document.getElementById("container");
+  if (!container) return;
+
+  const quillServer = new Quill(container, {
+    theme: "snow",
+    modules: { toolbar: toolbarOptions }
+  });
+  quillServer.disable();
+  quillServer.setText("Loading the document....");
+  setQuill(quillServer);
+}, []);
+
+
+  useEffect(() => {
+    const socketServer = io("https://collab-docs-any8.onrender.com", { transports: ['websocket'] ,withCredentials: true});
     setSocket(socketServer);
 
     return () => {
