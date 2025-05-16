@@ -10,7 +10,7 @@ Connection();
 
 const io = new Server(PORT, {
   cors: {
-    origin: ["http://localhost:3000","https://collab-docs-3lbo.onrender.com"],
+    origin: "https://collab-docs-3lbo.onrender.com",
     methods: ["GET", "POST"],
   },
 });
