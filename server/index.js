@@ -12,6 +12,7 @@ const io = new Server(PORT, {
   cors: {
     origin: "https://collab-docs-3lbo.onrender.com",
     methods: ["GET", "POST"],
+    credentials:true
   },
 });
 
