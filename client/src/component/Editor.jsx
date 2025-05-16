@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box } from "@mui/material";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
@@ -27,9 +27,9 @@ const toolbarOptions = [
 ];
 
 const Editor = () => {
-  const {id} = useParams();
-  const [socket,setSocket] = useState();
-  const [quill,setQuill] = useState();
+  const { id } = useParams();
+  const [socket, setSocket] = useState();
+  const [quill, setQuill] = useState();
 
   useEffect(() => {
     const quillServer = new Quill("#container", { theme: "snow", modules: { toolbar: toolbarOptions } });
@@ -39,67 +39,67 @@ const Editor = () => {
   }, []);
 
   useEffect(() => {
-    const socketServer = io("https://collab-docs-any8.onrender.com");
+    const socketServer = io("https://collab-docs-any8.onrender.com", { transports: ['websocket'] });
     setSocket(socketServer);
 
     return () => {
       socketServer.disconnect();
     }
-  },[]);
+  }, []);
 
-  useEffect(()=>{
-    if(socket === null || quill === null) return;
-    const handleChange = (delta,oldData,source) =>{
-       if(source !== "user") return;
+  useEffect(() => {
+    if (socket === null || quill === null) return;
+    const handleChange = (delta, oldData, source) => {
+      if (source !== "user") return;
 
-       socket && socket.emit("send-changes",delta);
+      socket && socket.emit("send-changes", delta);
     }
 
-    quill && quill.on("text-change",handleChange);
-
-    return () =>{
-      quill && quill.off("text-change",handleChange);
-    }
-
-  },[quill,socket]);
-
-  useEffect(()=>{
-    if(socket === null || quill === null) return;
-    const handleChange = (delta) =>{
-       quill.updateContents(delta);
-    }
-
-    socket && socket.on("receive-changes",handleChange);
-
-    return () =>{
-      socket && socket.off("receive-changes",handleChange);
-    }
-
-  },[quill,socket]);
-
-  useEffect(()=>{
-    if(quill === null || socket === null) return;
-    
-    socket && socket.once("load-document",document=>{
-        quill && quill.setContents(document);
-        quill && quill.enable();
-    })
-
-    socket && socket.emit("get-document",id);
-
-  },[quill,socket,id]);
-
-  useEffect(()=>{
-    if(socket === null || quill === null) return;
-
-    const interval = setInterval(()=>{
-      socket && socket.emit("save-document",quill.getContents())
-    },2000);
+    quill && quill.on("text-change", handleChange);
 
     return () => {
-       clearInterval(interval);  
+      quill && quill.off("text-change", handleChange);
     }
-  },[socket,quill]);
+
+  }, [quill, socket]);
+
+  useEffect(() => {
+    if (socket === null || quill === null) return;
+    const handleChange = (delta) => {
+      quill.updateContents(delta);
+    }
+
+    socket && socket.on("receive-changes", handleChange);
+
+    return () => {
+      socket && socket.off("receive-changes", handleChange);
+    }
+
+  }, [quill, socket]);
+
+  useEffect(() => {
+    if (quill === null || socket === null) return;
+
+    socket && socket.once("load-document", document => {
+      quill && quill.setContents(document);
+      quill && quill.enable();
+    })
+
+    socket && socket.emit("get-document", id);
+
+  }, [quill, socket, id]);
+
+  useEffect(() => {
+    if (socket === null || quill === null) return;
+
+    const interval = setInterval(() => {
+      socket && socket.emit("save-document", quill.getContents())
+    }, 2000);
+
+    return () => {
+      clearInterval(interval);
+    }
+  }, [socket, quill]);
 
   return (
     <Component>
