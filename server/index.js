@@ -41,7 +41,7 @@ import Connection from "./database/db.js";
 import { getDocument, updateDocument } from "./controller/doc-controller.js";
 
 const app = express();
-const PORT = process.env.PORT || 9000;
+const PORT = 9000;
 
 // Middleware
 app.use(cors({
