@@ -122,8 +122,7 @@
 
 // export default Editor;
 
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Box } from "@mui/material";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
@@ -154,83 +153,95 @@ const toolbarOptions = [
 
 const Editor = () => {
   const { id } = useParams();
-  const [socket, setSocket] = useState();
-  const [quill, setQuill] = useState();
-  const [isDocLoaded, setIsDocLoaded] = useState(false);
+  const socketRef = useRef();
+  const quillRef = useRef();
+  const [isLoaded, setIsLoaded] = useState(false);
 
+  // Initialize socket connection
+  useEffect(() => {
+    const socket = io("https://collab-docs-any8.onrender.com", {
+      transports: ["websocket"],
+      withCredentials: true,
+    });
+    socketRef.current = socket;
+
+    return () => socket.disconnect();
+  }, []);
+
+  // Initialize Quill
   useEffect(() => {
     const container = document.getElementById("container");
     if (!container) return;
 
-    const quillServer = new Quill(container, {
+    container.innerHTML = ""; // prevent duplicate editors
+    const editor = document.createElement("div");
+    container.append(editor);
+
+    const quill = new Quill(editor, {
       theme: "snow",
       modules: { toolbar: toolbarOptions },
     });
-    quillServer.disable();
-    quillServer.setText("Loading the document....");
-    setQuill(quillServer);
+    quill.disable();
+    quill.setText("Loading the document...");
+    quillRef.current = quill;
   }, []);
 
+  // Load document from server
   useEffect(() => {
-    const socketServer = io("https://collab-docs-any8.onrender.com", {
-      transports: ["websocket"],
-      withCredentials: true,
+    const socket = socketRef.current;
+    const quill = quillRef.current;
+    if (!socket || !quill) return;
+
+    socket.once("load-document", (document) => {
+      quill.setContents(document);
+      quill.enable();
+      setIsLoaded(true);
     });
-    setSocket(socketServer);
 
-    return () => {
-      socketServer.disconnect();
-    };
-  }, []);
+    socket.emit("get-document", id);
+  }, [id]);
 
+  // Send changes to server
   useEffect(() => {
-    if (socket === null || quill === null) return;
+    const socket = socketRef.current;
+    const quill = quillRef.current;
+    if (!socket || !quill) return;
 
-    const handleChange = (delta, oldData, source) => {
+    const handleChange = (delta, oldDelta, source) => {
       if (source !== "user") return;
       socket.emit("send-changes", delta);
     };
 
     quill.on("text-change", handleChange);
-    return () => {
-      quill.off("text-change", handleChange);
-    };
-  }, [quill, socket]);
+    return () => quill.off("text-change", handleChange);
+  }, []);
 
+  // Receive changes from server
   useEffect(() => {
-    if (socket === null || quill === null) return;
+    const socket = socketRef.current;
+    const quill = quillRef.current;
+    if (!socket || !quill) return;
 
     const handleChange = (delta) => {
       quill.updateContents(delta);
     };
 
     socket.on("receive-changes", handleChange);
-    return () => {
-      socket.off("receive-changes", handleChange);
-    };
-  }, [quill, socket]);
+    return () => socket.off("receive-changes", handleChange);
+  }, []);
 
+  // Auto-save
   useEffect(() => {
-    if (quill === null || socket === null) return;
-
-    socket.once("load-document", (document) => {
-      quill.setContents(document);
-      quill.enable();
-      setIsDocLoaded(true);
-    });
-
-    socket.emit("get-document", id);
-  }, [quill, socket, id]);
-
-  useEffect(() => {
-    if (socket === null || quill === null || !isDocLoaded) return;
+    const socket = socketRef.current;
+    const quill = quillRef.current;
+    if (!socket || !quill || !isLoaded) return;
 
     const interval = setInterval(() => {
       socket.emit("save-document", quill.getContents());
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [socket, quill, isDocLoaded]);
+  }, [isLoaded]);
 
   return (
     <Component>
@@ -240,3 +251,4 @@ const Editor = () => {
 };
 
 export default Editor;
+
