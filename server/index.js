@@ -64,7 +64,8 @@ const io = new Server(server, {
     origin: "https://collab-docs-3lbo.onrender.com",
     methods: ["GET", "POST"],
     credentials: true
-  }
+  },
+  
 });
 
 app.use(cors({
