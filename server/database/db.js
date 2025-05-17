@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
-const Connection = async (username="vipulthebest123",password = "Saimagic123%40") =>{
-    const URL = `mongodb+srv://${username}:${password}@google-doc-clone.d4fvx.mongodb.net/?retryWrites=true&w=majority&appName=Collab-doc`;
+const Connection = async () =>{
+    const URL = process.env.MONGO_URL;
 
     try{
        await mongoose.connect(URL,{
