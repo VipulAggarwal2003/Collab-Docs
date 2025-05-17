@@ -56,10 +56,11 @@ const server = http.createServer(app);
 // Create WebSocket server
 const io = new Server(server, {
   cors: {
-    origin: "https://collab-docs-3lbo.onrender.com", // your frontend URL
+    origin: "*",
     methods: ["GET", "POST"],
     credentials: true
-  }
+  },
+  transports: ['websocket']
 });
 
 // Connect to DB
