@@ -24,6 +24,11 @@ app.use(cors({
   credentials: true
 }));
 
+app.use((err, req, res, next) => {
+  console.error("Custom error log:", err);
+  next(err);
+});
+
 io.on('connection', (socket) => {
   console.log('🟢 Client connected:', socket.id);
 
