@@ -45,7 +45,7 @@ const PORT = 9000;
 
 // Middleware
 app.use(cors({
-  origin: "https://collab-docs-3lbo.onrender.com", // your frontend URL
+  origin: "*",
   methods: ["GET", "POST"],
   credentials: true
 }));
