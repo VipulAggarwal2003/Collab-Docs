@@ -1,164 +1,63 @@
-// // import { Server } from "socket.io";
-
-// // import Connection from "./database/db.js";
-
-// // import { getDocument, updateDocument } from "./controller/doc-controller.js";
-
-// // const PORT = 9000;
-
-// // Connection();
-
-// // const io = new Server(PORT, {
-// //   cors: {
-// //     origin: "https://collab-docs-3lbo.onrender.com",
-// //     methods: ["GET", "POST"],
-// //     credentials:true
-// //   },
-// // });
-
-// // io.on("connection", (socket) => {
-// //   socket.on("get-document", async (documentId) => {
-// //     const document = await getDocument(documentId);
-// //     socket.join(documentId);
-// //     socket.emit("load-document", document.data);
-
-// //     socket.on("send-changes", (delta) => {
-// //       socket.broadcast.to(documentId).emit("receive-changes", delta);
-// //     });
-
-// //     socket.on("save-document", async (data) => {
-// //       await updateDocument(documentId, data);
-// //     });
-// //   });
-// // });
-
-// import express from "express";
-// import http from "http";
-// import cors from "cors";
-// import { Server } from "socket.io";
-
-// import Connection from "./database/db.js";
-// import { getDocument, updateDocument } from "./controller/doc-controller.js";
+// import express from 'express';
+// import http from 'http';
+// import { Server } from 'socket.io';
+// import cors from 'cors';
 
 // const app = express();
-// const PORT = 9000;
-
-// // Middleware
-// app.use(cors({
-//   origin: "https://collab-docs-3lbo.onrender.com", // your frontend URL
-//   methods: ["GET", "POST"],
-//   credentials: true
-// }));
-
-// // Create HTTP server
 // const server = http.createServer(app);
 
-// // Create WebSocket server
 // const io = new Server(server, {
 //   cors: {
-//     origin: "https://collab-docs-3lbo.onrender.com", // your frontend URL
+//     origin: "https://collab-docs-3lbo.onrender.com",
 //     methods: ["GET", "POST"],
 //     credentials: true
 //   }
 // });
 
-// // Connect to DB
-// Connection();
+// app.use(cors({ origin: "https://collab-docs-3lbo.onrender.com", credentials: true }));
 
-// // WebSocket logic
-// io.on("connection", (socket) => {
-//   console.log("New client connected:", socket.id);
+// // Temporary in-memory store
+// const documents = {};
 
-//   socket.on("get-document", async (documentId) => {
-//     const document = await getDocument(documentId);
+// io.on('connection', (socket) => {
+//   console.log('🟢 New client connected:', socket.id);
+
+//   socket.on('get-document', (documentId) => {
+//     console.log('📥 get-document:', documentId);
+
+//     if (!documents[documentId]) {
+//       documents[documentId] = { ops: [{ insert: '' }] }; // default empty doc
+//     }
+
 //     socket.join(documentId);
-//     socket.emit("load-document", document.data);
+//     socket.emit('load-document', documents[documentId]);
 
-//     socket.on("send-changes", (delta) => {
-//       socket.broadcast.to(documentId).emit("receive-changes", delta);
+//     socket.on('send-changes', (delta) => {
+//       socket.broadcast.to(documentId).emit('receive-changes', delta);
 //     });
 
-//     socket.on("save-document", async (data) => {
-//       await updateDocument(documentId, data);
+//     socket.on('save-document', (data) => {
+//       documents[documentId] = data;
 //     });
-//   });
-
-//   socket.on("disconnect", () => {
-//     console.log("Client disconnected:", socket.id);
 //   });
 // });
 
-// // Start server
-// server.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
-
-
-// import express from "express";
-// import http from "http";
-// import cors from "cors";
-// import { Server } from "socket.io";
-
-// import Connection from "./database/db.js";
-// import { getDocument, updateDocument } from "./controller/doc-controller.js";
-
-// const app = express();
 // const PORT = process.env.PORT || 9000;
-
-// // Connect to DB
-// Connection();
-
-// // Middlewares
-// app.use(cors({
-//   origin: "https://collab-docs-3lbo.onrender.com", // frontend Render URL
-//   methods: ["GET", "POST"],
-//   credentials: true
-// }));
-
-// const server = http.createServer(app);
-
-// const io = new Server(server, {
-//   cors: {
-//     origin: "https://collab-docs-3lbo.onrender.com", // frontend Render URL
-//     methods: ["GET", "POST"],
-//     credentials: true
-//   }
-// });
-
-// // WebSocket logic
-// io.on("connection", (socket) => {
-//   console.log("New client connected:", socket.id);
-
-//   socket.on("get-document", async (documentId) => {
-//     const document = await getDocument(documentId);
-//     socket.join(documentId);
-//     socket.emit("load-document", document.data);
-  
-//     socket.on("send-changes", (delta) => {
-//       socket.broadcast.to(documentId).emit("receive-changes", delta);
-//     });
-
-//     socket.on("save-document", async (data) => {
-//       await updateDocument(documentId, data);
-//     });
-//   });
-
-//   socket.on("disconnect", () => {
-//     console.log("Client disconnected:", socket.id);
-//   });
-// });
-
 // server.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
+//   console.log(`🚀 Server listening on port ${PORT}`);
 // });
 
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import Connection from './database/db.js';
+import { getDocument, updateDocument } from './controller/doc-controller.js';
 
 const app = express();
 const server = http.createServer(app);
+
+Connection(); // Connect to MongoDB
 
 const io = new Server(server, {
   cors: {
@@ -168,35 +67,33 @@ const io = new Server(server, {
   }
 });
 
-app.use(cors({ origin: "https://collab-docs-3lbo.onrender.com", credentials: true }));
-
-// Temporary in-memory store
-const documents = {};
+app.use(cors({
+  origin: "https://collab-docs-3lbo.onrender.com",
+  credentials: true
+}));
 
 io.on('connection', (socket) => {
-  console.log('🟢 New client connected:', socket.id);
+  console.log('🟢 Client connected:', socket.id);
 
-  socket.on('get-document', (documentId) => {
+  socket.on('get-document', async (documentId) => {
     console.log('📥 get-document:', documentId);
 
-    if (!documents[documentId]) {
-      documents[documentId] = { ops: [{ insert: '' }] }; // default empty doc
-    }
-
+    const document = await getDocument(documentId);
     socket.join(documentId);
-    socket.emit('load-document', documents[documentId]);
+    socket.emit('load-document', document.data);
 
     socket.on('send-changes', (delta) => {
       socket.broadcast.to(documentId).emit('receive-changes', delta);
     });
 
-    socket.on('save-document', (data) => {
-      documents[documentId] = data;
+    socket.on('save-document', async (data) => {
+      await updateDocument(documentId, data);
     });
   });
 });
 
 const PORT = process.env.PORT || 9000;
 server.listen(PORT, () => {
-  console.log(`🚀 Server listening on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
+
