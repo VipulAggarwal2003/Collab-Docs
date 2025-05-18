@@ -18,12 +18,11 @@ const io = new Server(server, {
     origin: "*",
     methods: ["GET", "POST"],
   },
-  transports: ['websocket','polling']
+  transports: ['websocket']
 });
 
 app.use(cors({
-  origin: "*",
-  credentials: false
+  origin: "*"
 }));
 
 io.on('connection', (socket) => {

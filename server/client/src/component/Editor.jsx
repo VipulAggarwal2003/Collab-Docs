@@ -175,8 +175,7 @@ const Editor = () => {
   // Setup socket connection
   useEffect(() => {
     const socketInstance = io('/', {
-      transports: ['websocket'],
-       withCredentials: true
+      transports: ['websocket']
     });
 
     setSocket(socketInstance);
