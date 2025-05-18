@@ -118,7 +118,7 @@
 // export default Editor;
 
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState} from 'react';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 
@@ -151,25 +151,15 @@ const toolbarOptions = [
 const Editor = () => {
   const [socket, setSocket] = useState(null);
   const [quill, setQuill] = useState(null);
-  const wrapperRef = useRef(null);
   const { id } = useParams();
   
   // Set up Quill after component is mounted
-  useEffect(() => {
-    const wrapper = wrapperRef.current;
-    wrapper.innerHTML = '';
-    const editor = document.createElement('div');
-    wrapper.append(editor);
-
-    const quillInstance = new Quill(editor, {
-      theme: 'snow',
-      modules: { toolbar: toolbarOptions },
-    });
-
-    quillInstance.disable();
-    quillInstance.setText('Loading the document...');
-    setQuill(quillInstance);
-  }, []);
+    useEffect(() => {
+        const quillServer = new Quill('#container', { theme: 'snow', modules: { toolbar: toolbarOptions }});
+        quillServer.disable();
+        quillServer.setText('Loading the document...')
+        setQuill(quillServer);
+    }, []);
 
   // Setup socket connection
   useEffect(() => {
@@ -244,7 +234,7 @@ const Editor = () => {
 
   return (
     <Component>
-      <Box  ref={wrapperRef} className='container' id='container'></Box>
+      <Box className='container' id='container'></Box>
       
     </Component>
   );
