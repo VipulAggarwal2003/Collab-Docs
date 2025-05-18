@@ -15,9 +15,8 @@ Connection(); // Connect to MongoDB
 
 const io = new Server(server, {
   cors: {
-    origin: "https://collab-docs-akrb.onrender.com",
+    origin: "*",
     methods: ["GET", "POST"],
-    credentials: true
   },
   transports: ['websocket','polling']
 });
@@ -46,7 +45,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('save-document', async (data) => {
-      
+
       await updateDocument(documentId, data);
     });
   });

@@ -174,8 +174,9 @@ const Editor = () => {
 
   // Setup socket connection
   useEffect(() => {
-    const socketInstance = io('https://collab-docs-akrb.onrender.com', {
+    const socketInstance = io('/', {
       transports: ['websocket'],
+       withCredentials: true
     });
 
     setSocket(socketInstance);
