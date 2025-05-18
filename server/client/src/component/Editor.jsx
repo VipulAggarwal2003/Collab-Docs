@@ -47,7 +47,7 @@ const Editor = () => {
     }, []);
 
     useEffect(() => {
-        const socketServer = io('https://collab-docs-akrb.onrender.com');
+        const socketServer = io('https://collab-docs-akrb.onrender.com',{transports:["websocket"]});
         setSocket(socketServer);
 
         return () => {
