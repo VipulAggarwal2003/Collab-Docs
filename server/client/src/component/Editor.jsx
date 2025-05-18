@@ -188,7 +188,7 @@ const Editor = () => {
   // Get document from backend on initial load or refresh
   useEffect(() => {
     if (socket === null || quill === null || !id) return;
-
+    
     console.log('📤 Emitting get-document:', id);
     socket.once('load-document', (document) => {
       console.log('📥 Received load-document:', document);
