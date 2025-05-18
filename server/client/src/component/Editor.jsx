@@ -154,7 +154,7 @@ const Editor = () => {
   const [quill, setQuill] = useState(null);
   const wrapperRef = useRef(null);
   const { id } = useParams();
-
+  
   // Set up Quill after component is mounted
   useEffect(() => {
     const wrapper = wrapperRef.current;
@@ -174,7 +174,7 @@ const Editor = () => {
 
   // Setup socket connection
   useEffect(() => {
-    const socketInstance = io('/', {
+    const socketInstance = io('https://collab-docs-akrb.onrender.com', {
       transports: ['websocket']
     });
 
@@ -246,6 +246,7 @@ const Editor = () => {
   return (
     <Component>
       <Box ref={wrapperRef} className='container'></Box>
+      {console.log("editor.jsx rendered...")}
     </Component>
   );
 };
