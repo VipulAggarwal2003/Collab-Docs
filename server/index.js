@@ -15,7 +15,7 @@ Connection(); // Connect to MongoDB
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "https://collab-docs-akrb.onrender.com",
     methods: ["GET", "POST"],
     credentials: true
   },
@@ -26,10 +26,7 @@ app.use(cors({
   origin: "*",
   credentials: false
 }));
-app.get('*',(req,res) =>{
-   console.log("id : ",req.params);
-   res.send("hello");
-})
+
 io.on('connection', (socket) => {
   console.log('🟢 Client connected:', socket.id);
 
