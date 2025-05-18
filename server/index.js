@@ -46,6 +46,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('save-document', async (data) => {
+      
       await updateDocument(documentId, data);
     });
   });

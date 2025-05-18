@@ -1,7 +1,7 @@
 import Document from "../models/doc-model.js";
 
 export const getDocument = async (id) =>{
-    if(id === null) return;
+    if(id === null || id === undefined) {console.log(id) ; return;}
 
     const document = await Document.findById(id);
 
