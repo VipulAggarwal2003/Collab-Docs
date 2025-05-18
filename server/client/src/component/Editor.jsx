@@ -130,7 +130,6 @@ import { useParams } from 'react-router-dom';
 
 const Component = styled.div`
   background: #F5F5F5;
-  height: 100vh;
 `;
 
 const toolbarOptions = [
@@ -245,8 +244,8 @@ const Editor = () => {
 
   return (
     <Component>
-      <Box ref={wrapperRef} className='container'></Box>
-      {console.log("editor.jsx rendered...")}
+      <Box  ref={wrapperRef} className='container' id='container'></Box>
+      
     </Component>
   );
 };
