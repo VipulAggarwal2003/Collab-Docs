@@ -31,7 +31,6 @@ io.on('connection', (socket) => {
   console.log('🟢 Client connected:', socket.id);
 
   socket.on('get-document', async (documentId) => {
-    console.log('📥 get-document:', documentId);
       if (!documentId) {
     console.error(" Missing documentId from client. Disconnecting socket:", socket.id);
     socket.disconnect(true);
@@ -64,7 +63,6 @@ if(process.env.NODE_ENV === "production"){
   app.use(express.static(path.join(__dirname, "client", "build")));
   app.get("*", (req, res) => {
   console.log("Params:", req.params);     // usually empty
-  console.log("Query:", req.query);       // any ?query=params
     res.sendFile(path.join(__dirname, "client", "build", "index.html"));
   })
  

@@ -8,8 +8,7 @@ const Connection = async () =>{
 
     try{
        await mongoose.connect(URL,{
-         useUnifiedTopology:true,
-         useNewUrlParser:true
+         dbName:'google-doc-clone'
        });
 
        console.log("Database connected successfully");
