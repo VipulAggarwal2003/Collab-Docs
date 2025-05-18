@@ -86,7 +86,7 @@ const Editor = () => {
     }, [quill, socket]);
 
     useEffect(() => {
-        if (quill === null || socket === null) return;
+    if (quill === null || socket === null || !id) return;
 
         socket && socket.once('load-document', document => {
             quill.setContents(document);

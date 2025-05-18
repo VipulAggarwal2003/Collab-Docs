@@ -7,12 +7,15 @@ import { getDocument, updateDocument } from './controller/doc-controller.js';
 import path from "path";
 const app = express();
 const server = http.createServer(app);
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
 
+dotenv.config()
 Connection(); // Connect to MongoDB
 
 const io = new Server(server, {
   cors: {
-    origin: "https://collab-docs-3lbo.onrender.com",
+    origin: "*",
     methods: ["GET", "POST"],
     credentials: true
   },
@@ -20,20 +23,23 @@ const io = new Server(server, {
 });
 
 app.use(cors({
-  origin: "https://collab-docs-3lbo.onrender.com",
-  credentials: true
+  origin: "*",
+  credentials: false
 }));
-
-app.use((err, req, res, next) => {
-  console.error("Custom error log:", err);
-  next(err);
-});
-
+app.get('*',(req,res) =>{
+   console.log("id : ",req.params);
+   res.send("hello");
+})
 io.on('connection', (socket) => {
   console.log('🟢 Client connected:', socket.id);
 
   socket.on('get-document', async (documentId) => {
     console.log('📥 get-document:', documentId);
+      if (!documentId) {
+    console.error(" Missing documentId from client. Disconnecting socket:", socket.id);
+    socket.disconnect(true);
+    return;
+  }
 
     const document = await getDocument(documentId);
     socket.join(documentId);
@@ -49,12 +55,22 @@ io.on('connection', (socket) => {
   });
 });
 
+// ---------------- deployment code ----------------
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
+
 if(process.env.NODE_ENV === "production"){
-   const dirPath = path.resolve();
-   app.use(express.static("./client/build"));
-   app.get('*',(req,res)=>{
-     res.sendFile(path.resolve(dirPath,'./client/build','index.html'));
-   })
+
+  app.use(express.static(path.join(__dirname, "client", "build")));
+  app.get("*", (req, res) => {
+  console.log("Params:", req.params);     // usually empty
+  console.log("Query:", req.query);       // any ?query=params
+    res.sendFile(path.join(__dirname, "client", "build", "index.html"));
+  })
+ 
 }
 const PORT = process.env.PORT || 9000;
 server.listen(PORT, () => {
